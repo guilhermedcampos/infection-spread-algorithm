@@ -12,41 +12,53 @@ vector<bool> in_stack;
 stack<int> st;
 int timer = 0, scc_count = 0;
 
-// Tarjan's algorithm for finding strongly connected components
-void tarjanSCC(int u) {
-    disc[u] = low[u] = timer++;
-    st.push(u);
-    in_stack[u] = true;
+void tarjanSCC(int start) {
+    stack<pair<int, int>> s;
+    s.push({start, 0});
 
-    for (int v : adj[u]) {
-        int disc_v = disc[v];
-        if (disc_v == -1) {
-            tarjanSCC(v);
-            low[u] = min(low[u], low[v]);
-        } else if (in_stack[v]) {
-            low[u] = min(low[u], disc_v);
-        }
-    }
+    while (!s.empty()) {
+        int u = s.top().first;
+        int state = s.top().second;
+        s.pop();
 
-    if (low[u] == disc[u]) {
-        while (true) {
-            int v = st.top();
-            st.pop();
-            in_stack[v] = false;
-            scc[v] = scc_count;
-            if (u == v)
-                break;
+        if (state == 0) {
+            disc[u] = low[u] = timer++;
+            st.push(u);
+            in_stack[u] = true;
+
+            s.push({u, 1});
+            for (int v : adj[u]) {
+                if (disc[v] == -1) {
+                    s.push({v, 0});
+                } else if (in_stack[v]) {
+                    low[u] = min(low[u], low[v]);
+                }
+            }
+        } else {
+            for (int v : adj[u]) {
+                if (in_stack[v]) {
+                    low[u] = min(low[u], low[v]);
+                }
+            }
+            if (low[u] == disc[u]) {
+                while (!st.empty() && st.top() != u) {
+                    int v = st.top();
+                    st.pop();
+                    in_stack[v] = false;
+                    scc[v] = scc_count;
+                }
+                st.pop();
+                in_stack[u] = false;
+                scc[u] = scc_count++;
+            }
         }
-        scc_count++;
     }
 }
 
-// Iterative DFS function to find the maximum path in the SCC graph
 int dfs(int start, vector<int> &dp) {
     stack<int> s;
     s.push(start);
 
-    // First pass: push all nodes to the stack
     while (!s.empty()) {
         int u = s.top();
         if (dp[u] != -1) {
@@ -73,6 +85,7 @@ int dfs(int start, vector<int> &dp) {
 
     return dp[start];
 }
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
@@ -110,7 +123,6 @@ int main() {
         }
     }
 
-    // Optimization: Only call DFS for nodes that have no incoming edges
     vector<int> dp(scc_count, -1);
     int max_connections = 0;
     for (int i = 0; i < scc_count; i++) {
