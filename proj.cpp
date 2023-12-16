@@ -12,6 +12,7 @@ vector<bool> in_stack;
 stack<int> st;
 int timer = 0, scc_count = 0;
 
+// Tarjan's algorithm for finding strongly connected components
 void tarjanSCC(int u) {
     disc[u] = low[u] = timer++;
     st.push(u);
@@ -40,16 +41,38 @@ void tarjanSCC(int u) {
     }
 }
 
-int dfs(int u, vector<int> &dp) {
-    if (dp[u] != -1)
-        return dp[u];
-    dp[u] = 0;
-    for (int v : adj_scc[u]) {
-        dp[u] = max(dp[u], 1 + dfs(v, dp));
-    }
-    return dp[u];
-}
+// Iterative DFS function to find the maximum path in the SCC graph
+int dfs(int start, vector<int> &dp) {
+    stack<int> s;
+    s.push(start);
 
+    // First pass: push all nodes to the stack
+    while (!s.empty()) {
+        int u = s.top();
+        if (dp[u] != -1) {
+            s.pop();
+            continue;
+        }
+
+        bool finished = true;
+        for (int v : adj_scc[u]) {
+            if (dp[v] == -1) {
+                s.push(v);
+                finished = false;
+            }
+        }
+
+        if (finished) {
+            dp[u] = 0;
+            for (int v : adj_scc[u]) {
+                dp[u] = max(dp[u], 1 + dp[v]);
+            }
+            s.pop();
+        }
+    }
+
+    return dp[start];
+}
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
@@ -87,10 +110,13 @@ int main() {
         }
     }
 
+    // Optimization: Only call DFS for nodes that have no incoming edges
     vector<int> dp(scc_count, -1);
     int max_connections = 0;
     for (int i = 0; i < scc_count; i++) {
-        max_connections = max(max_connections, dfs(i, dp));
+        if (in_degree[i] == 0) {
+            max_connections = max(max_connections, dfs(i, dp));
+        }
     }
 
     printf("%d\n", max_connections);
