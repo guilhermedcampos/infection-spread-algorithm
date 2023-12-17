@@ -85,6 +85,9 @@ int dfs(int start, map<int, vector<int>>& adj_scc, vector<int>& dp) {
 }
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    
     int n, m;
     scanf("%d %d", &n, &m);
 
