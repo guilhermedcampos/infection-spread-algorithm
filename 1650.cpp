@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
+#include <stack>
 #include <vector>
 
 using namespace std;
@@ -30,25 +31,24 @@ using namespace std;
  */
 void tarjanSCC(int start, vector<vector<int>> &adj, vector<int> &disc,
                vector<int> &low, vector<int> &scc, vector<bool> &in_stack,
-               vector<int> &st, int &timer, int &scc_count) {
-    vector<pair<int, int>> s;
-    s.reserve(adj.size()); // reserve memory
-    s.push_back({start, 0});
+               stack<int> &st, int &timer, int &scc_count) {
+    stack<pair<int, int>> s;
+    s.push({start, 0});
 
     while (!s.empty()) {
-        int u = s.back().first;
-        int state = s.back().second;
-        s.pop_back();
+        int u = s.top().first;
+        int state = s.top().second;
+        s.pop();
 
         if (state == 0) {
             disc[u] = low[u] = timer++;
-            st.push_back(u);
+            st.push(u);
             in_stack[u] = true;
 
-            s.push_back({u, 1});
+            s.push({u, 1});
             for (int v : adj[u]) {
                 if (disc[v] == -1) {
-                    s.push_back({v, 0});
+                    s.push({v, 0});
                 } else if (in_stack[v]) {
                     low[u] = min(low[u], low[v]);
                 }
@@ -60,19 +60,20 @@ void tarjanSCC(int start, vector<vector<int>> &adj, vector<int> &disc,
                 }
             }
             if (low[u] == disc[u]) {
-                while (!st.empty() && st.back() != u) {
-                    int v = st.back();
-                    st.pop_back();
+                while (!st.empty() && st.top() != u) {
+                    int v = st.top();
+                    st.pop();
                     in_stack[v] = false;
                     scc[v] = scc_count;
                 }
-                st.pop_back();
+                st.pop();
                 in_stack[u] = false;
                 scc[u] = scc_count++;
             }
         }
     }
 }
+
 
 /**
  * @brief Depth-first search for finding the maximum number of connections.
@@ -84,21 +85,24 @@ void tarjanSCC(int start, vector<vector<int>> &adj, vector<int> &disc,
  * @return int Maximum number of connections from the starting node.
  */
 int dfs(int start, vector<int> &dp, vector<vector<int>> &adj_scc) {
-    vector<int> s;
-    s.reserve(adj_scc.size()); // reserve memory
-    s.push_back(start);
+    stack<int> s;
+    s.push(start);
 
     while (!s.empty()) {
-        int u = s.back();
+        int u = s.top();
         if (dp[u] != -1) {
-            s.pop_back();
+            s.pop();
+            continue;
+        }
+
+        if (dp[u] != -1) {
             continue;
         }
 
         bool finished = true;
         for (int v : adj_scc[u]) {
             if (dp[v] == -1) {
-                s.push_back(v);
+                s.push(v);
                 finished = false;
             }
         }
@@ -108,7 +112,7 @@ int dfs(int start, vector<int> &dp, vector<vector<int>> &adj_scc) {
             for (int v : adj_scc[u]) {
                 dp[u] = max(dp[u], 1 + dp[v]);
             }
-            s.pop_back();
+            s.pop();
         }
     }
 
@@ -127,20 +131,11 @@ int main() {
     int n, m;
     scanf("%d %d", &n, &m);
 
-    vector<vector<int>> adj(n + 1),
-        adj_scc; // adjacency list of the graph and the SCC graph
-    vector<int> disc(n + 1, -1), low(n + 1, -1), scc(n + 1), in_degree,
-        st; // discovery times, low-link values, SCC identifiers, and in-degrees
-            // of nodes
-    vector<bool> in_stack(
-        n + 1, false); // boolean array to check if a node is in the stack
-    int timer = 0, scc_count = 0; // timer for discovery times, count of SCCs
-
-    adj.resize(n + 1);
-    disc.resize(n + 1, -1);
-    low.resize(n + 1, -1);
-    scc.resize(n + 1);
-    in_stack.resize(n + 1, false);
+    vector<vector<int>> adj(n + 1), adj_scc;
+    vector<int> disc(n + 1, -1), low(n + 1, -1), scc(n + 1), in_degree;
+    stack<int> st; // Change vector<int> to stack<int>
+    vector<bool> in_stack(n + 1, false);
+    int timer = 0, scc_count = 0;
 
     for (int i = 0; i < m; i++) {
         int u, v;
