@@ -1,13 +1,3 @@
-/**
- * @file proj.cpp
- * @author Maria Ramos (ist1105875), Guilherme Campos (ist1106909)
- * @brief This program solves a problem related to finding the maximum number of
- * connections in a directed graph. The problem is solved using Tarjan's
- * algorithm for finding strongly connected components (SCCs) and a depth-first
- * search (DFS) for finding the maximum number of connections.
- * @date 18.12.2023
- */
-
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
@@ -21,17 +11,18 @@ using namespace std;
  *
  * @param start Starting node.
  * @param adj Adjacency list of the graph.
- * @param disc Discovery times of nodes.
- * @param low Low-link values of nodes.
  * @param scc SCC identifiers of nodes.
- * @param in_stack Boolean array to check if a node is in the stack.
+ * @param in_degree In-degrees of nodes.
  * @param st Stack of nodes.
  * @param timer Timer for discovery times.
  * @param scc_count Count of SCCs.
  */
-void tarjanSCC(int start, vector<vector<int>> &adj, vector<int> &disc,
-               vector<int> &low, vector<int> &scc, vector<bool> &in_stack,
-               stack<int> &st, int &timer, int &scc_count) {
+void tarjanSCC(int start, vector<vector<int>> &adj, vector<int> &scc,
+               vector<int> &in_degree, stack<int> &st, int &timer, int &scc_count) {
+    vector<int> disc(adj.size(), -1);
+    vector<int> low(adj.size(), -1);
+    vector<bool> in_stack(adj.size(), false);
+
     stack<pair<int, int>> s;
     s.push({start, 0});
 
@@ -74,7 +65,6 @@ void tarjanSCC(int start, vector<vector<int>> &adj, vector<int> &disc,
     }
 }
 
-
 /**
  * @brief Depth-first search for finding the maximum number of connections.
  *
@@ -92,10 +82,6 @@ int dfs(int start, vector<int> &dp, vector<vector<int>> &adj_scc) {
         int u = s.top();
         if (dp[u] != -1) {
             s.pop();
-            continue;
-        }
-
-        if (dp[u] != -1) {
             continue;
         }
 
@@ -132,9 +118,8 @@ int main() {
     scanf("%d %d", &n, &m);
 
     vector<vector<int>> adj(n + 1), adj_scc;
-    vector<int> disc(n + 1, -1), low(n + 1, -1), scc(n + 1), in_degree;
+    vector<int> scc(n + 1, 0), in_degree;
     stack<int> st; // Change vector<int> to stack<int>
-    vector<bool> in_stack(n + 1, false);
     int timer = 0, scc_count = 0;
 
     for (int i = 0; i < m; i++) {
@@ -144,8 +129,8 @@ int main() {
     }
 
     for (int i = 1; i <= n; i++) {
-        if (disc[i] == -1) {
-            tarjanSCC(i, adj, disc, low, scc, in_stack, st, timer, scc_count);
+        if (scc[i] == 0) {
+            tarjanSCC(i, adj, scc, in_degree, st, timer, scc_count);
         }
     }
 
