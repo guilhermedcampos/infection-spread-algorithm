@@ -56,7 +56,7 @@ To execute the algorithm on a specific test input, run the command after compili
 
     - src/max-connections.cpp: Main algorithm implementation in c++ language.
     - src/max-connections-chrono.cpp: Algorithm version that measures execution time.
-    - src/gen_supermarble.cpp: Auxiliar tool to generate additional test inputs.
+    - src/gen_tuganet.cpp: Auxiliar tool to generate additional test inputs.
     - makefile: Makefile for building and running (`max-connections-chorno.cpp`) on all the inputs files in testsTime.
     - relatorio.pdf: Document explaining the main problem, summarizing the solution, and drawing conclusions from both practical and theoretical analyses.
 
