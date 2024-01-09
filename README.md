@@ -1,7 +1,7 @@
 # Disease Spread Analysis with Tarjan's SCC and DFS
 
 This repository presents a C++ implementation to analise the potential impact of disease spread within social networks,along with a version (`max-connections-chrono.cpp`) that measures the execution time for each input. The goal is to determine the worst-case scenario for disease propagation, considering instant transmission between individuals who share direct or indirect connections. Our solution consists in an adapted iterative Tarjan's algorithm for finding Strongly Connected Components (SCC). This enables the identification of socially interconnected groups. Complemented by a Depth-First Search (DFS), we determine the maximum number of connections within the identified components in the social graph. This approach ultimately leads to a comprehensive understanding of the worst-case disease spread scenario.
-For a deeper understanding, our algorithm integrates elements from graph theory, emphasizing the significance of SCC in modeling social structures and DFS for quantifying connections within these structures. 
+For a deeper understanding, our algorithm integrates elements from graph theory, emphasizing the significance of SCC in modeling social structures and DFS for quantifying connections within these structures.  
 
 ![alt text](https://github.com/guilhermedcampos/disease-spread-algorithm/assets/110358692/739fe5fe-9fa9-49bf-a0e3-6ae277e0e3b7)
 
